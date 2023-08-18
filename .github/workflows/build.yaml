@@ -1,0 +1,61 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.19.12-bookworm
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Run linter"
+        run: make lint
+  test:
+    name: "Tests"
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.19.12-bookworm
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Executing tests"
+        run: make test
+  vet:
+    name: "Vet"
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.19.12-bookworm
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Vetting"
+        run: make vet
+  fmt:
+    name: "Format"
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.19.12-bookworm
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Checking format"
+        run: make fmt
+  race:
+    name: "Racing conditions"
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.19.12-bookworm
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Testing for race conditions"
+        run: make race

@@ -11,7 +11,7 @@ import (
 )
 
 func CreateSuccessComponent(gs *lifecycle.GracefulShutdown, name string, delay time.Duration) {
-	gs.RegisterComponentWithFn(name, func() error {
+	_ = gs.RegisterComponentWithFn(name, func() error {
 		time.Sleep(delay)
 
 		// Shutdown is successful
@@ -20,7 +20,7 @@ func CreateSuccessComponent(gs *lifecycle.GracefulShutdown, name string, delay t
 }
 
 func CreateErrorComponent(gs *lifecycle.GracefulShutdown, name string, err error) {
-	gs.RegisterComponentWithFn(name, func() error {
+	_ = gs.RegisterComponentWithFn(name, func() error {
 		return err
 	})
 }
@@ -81,4 +81,20 @@ func Test_GracefulShutdown_TimeoutError(t *testing.T) {
 	}
 
 	assert.True(shutdownErr.IsTimeoutErr(), "ShutdownError should only return timeout errors")
+}
+
+func Test_GracefulShutdown_ErrorRegisterComponentTwice(t *testing.T) {
+	assert := assert2.New(t)
+	gs := lifecycle.NewGracefulShutdown(context.Background())
+
+	CreateSuccessComponent(gs, "ComponentA", 100*time.Millisecond)
+	err := gs.RegisterComponentWithFn("ComponentA", func() error {
+		return nil
+	})
+
+	if !assert.Error(err) {
+		return
+	}
+
+	assert.ErrorIs(err, lifecycle.ErrComponentAlreadyRegistered)
 }
