@@ -20,3 +20,7 @@ lint:
 	@echo "Linting code"
 	@golangci-lint run ./...
 .PHONY: lint
+
+fmt:
+	@echo "Checking code format"
+	@go fmt ./...
