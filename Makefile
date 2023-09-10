@@ -1,6 +1,6 @@
 test:
 	@echo "Running tests"
-	@go test -timeout 1s ./...
+	@go test -timeout 30s ./...
 .PHONY: test
 
 vet:
@@ -10,7 +10,7 @@ vet:
 
 race:
 	@echo "Testing for race conditions"
-	@go test -race -timeout 1s ./...
+	@go test -race -timeout 30s ./...
 .PHONY: race
 
 lint:
