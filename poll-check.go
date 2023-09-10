@@ -1,11 +1,14 @@
 package lifecycle
 
-import "time"
+import (
+	"sync/atomic"
+	"time"
+)
 
 type PollComponentCheck struct {
 	name     string
-	isReady  bool
-	isActive bool
+	isReady  *atomic.Bool
+	isActive *atomic.Bool
 
 	pollDelay time.Duration
 	checkFn   func() bool
@@ -16,19 +19,20 @@ func (component *PollComponentCheck) Name() string {
 }
 
 func (component *PollComponentCheck) Ready() bool {
-	return component.isReady
+	return component.isReady.Load()
 }
 
 func (component *PollComponentCheck) Start() {
-	component.isActive = true
+	component.isActive.Store(true)
 
-	for component.isActive {
-		component.isReady = component.checkFn()
+	for component.isActive.Load() {
+		nextIsReady := component.checkFn()
+		component.isReady.Store(nextIsReady)
 
 		time.Sleep(component.pollDelay)
 	}
 }
 
 func (component *PollComponentCheck) Stop() {
-	component.isActive = false
+	component.isActive.Store(false)
 }

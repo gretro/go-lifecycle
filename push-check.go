@@ -1,8 +1,10 @@
 package lifecycle
 
+import "sync/atomic"
+
 type PushComponentCheck struct {
 	name    string
-	isReady bool
+	isReady *atomic.Bool
 }
 
 func (component *PushComponentCheck) Name() string {
@@ -10,9 +12,9 @@ func (component *PushComponentCheck) Name() string {
 }
 
 func (component *PushComponentCheck) Ready() bool {
-	return component.isReady
+	return component.isReady.Load()
 }
 
 func (component *PushComponentCheck) SetReady(isReady bool) {
-	component.isReady = isReady
+	component.isReady.Store(isReady)
 }
