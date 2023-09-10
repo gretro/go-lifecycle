@@ -1,7 +1,6 @@
 package lifecycle_test
 
 import (
-	"context"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -24,18 +23,16 @@ func Test_WhenStartingPoll_ShouldPollAtIntervals(t *testing.T) {
 	assert.Equal("my-poll-component", pollCheck.Name())
 	assert.False(pollCheck.Ready(), "by default, component should not be ready")
 
-	timeoutCtx, _ := context.WithTimeout(context.Background(), 275*time.Millisecond)
-
 	go pollCheck.Start()
 
-	<-timeoutCtx.Done()
+	time.Sleep(275 * time.Millisecond)
 	pollCheck.Stop()
 
 	nbCalls := calls.Load()
 	assert.GreaterOrEqual(calls.Load(), int32(5), "should have called the poll check at least 5 times")
 
 	// We wait a bit to see if anymore calls will be made later down
-	timeoutCtx, _ = context.WithTimeout(context.Background(), 125*time.Millisecond)
+	time.Sleep(125 * time.Millisecond)
 
 	assert.LessOrEqual(calls.Load(), nbCalls+1, "should have call check no more than 1 extra time")
 }
